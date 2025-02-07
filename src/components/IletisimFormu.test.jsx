@@ -64,21 +64,65 @@ test('[6] geçersiz bir mail girildiğinde "Hata: email geçerli bir email adres
 });
 
 test('[7] soyad girilmeden gönderilirse "Hata: soyad gereklidir." mesajı render ediliyor', async () => {
-  //find by text ve to be in the document ile hata metni ekranda mı kontrol edin
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const button = screen.getByRole('button', { name: /Gönder/i });
+  userEvent.click(button);
+  const error = await screen.findByText('Hata: soyad gereklidir.');
+  expect(error).toBeInTheDocument();
+
 });
 
 test('[8] ad, soyad, email render ediliyor. mesaj bölümü doldurulmadığında hata mesajı render edilmiyor.', async () => {
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const adInput = screen.getByTestId('name-input');
+  const soyadInput = screen.getByTestId('lastName-input');
+  const emailInput = screen.getByTestId('email-input');
+  const messageInput = screen.getByTestId('message-input');
+
+  userEvent.type(adInput, 'Mustafa');
+  userEvent.type(soyadInput, 'Doganguzel');
+  userEvent.type(emailInput, 'm.doganguzel@gmail.com');
+  userEvent.type(messageInput, '');
+
+  const button = screen.getByRole('button');
+  userEvent.click(button);
+
+  const renderedName = await screen.findByTestId('firstnameDisplay');
+  const renderedLastname = await screen.findByTestId('lastnameDisplay');
+  const renderedEmail = await screen.findByTestId('emailDisplay');
+  const error = screen.queryByTestId('error');
+
+  expect(renderedName).toBeInTheDocument();
+  expect(renderedLastname).toBeInTheDocument();
+  expect(renderedEmail).toBeInTheDocument();
+  expect(error).not.toBeInTheDocument();
 });
 
 test('[9] form gönderildiğinde girilen tüm değerler render ediliyor.', async () => {
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const adInput = screen.getByLabelText('Ad*');
+  const soyadInput = screen.getByLabelText('Soyad*');
+  const emailInput = screen.getByLabelText('E-mail*');
+  const messageInput = screen.getByLabelText('Mesaj');
+
+  userEvent.type(adInput, 'Mustafa');
+  userEvent.type(soyadInput, 'Doganguzel');
+  userEvent.type(emailInput, 'm.doganguzel@gmail.com');
+  userEvent.type(messageInput, 'deneme');
+
+  const button = screen.getByRole('button');
+  userEvent.click(button);
+
+  const renderedName = await screen.findByTestId('firstnameDisplay');
+  const renderedLastname = await screen.findByTestId('lastnameDisplay');
+  const renderedEmail = await screen.findByTestId('emailDisplay');
+  const renderedMessage = await screen.findByTestId('messageDisplay');
+
+  expect(renderedName).toBeInTheDocument();
+  expect(renderedLastname).toBeInTheDocument();
+  expect(renderedEmail).toBeInTheDocument();
+  expect(renderedMessage).toBeInTheDocument();
+
+
 });
 
-//
-
-//
 
 
 const testFile = fs
