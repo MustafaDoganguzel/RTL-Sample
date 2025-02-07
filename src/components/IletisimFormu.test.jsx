@@ -5,42 +5,62 @@ import userEvent from '@testing-library/user-event';
 import fs from 'fs';
 import path from 'path';
 
-//eksik import buraya
-//fixin tuzağı buraya? detaylar readme dosyasında.
+beforeEach(() => {
+  render(<IletisimFormu />);
+});
 
 test('[1] hata olmadan render ediliyor', () => {
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin!!!');
+  render(<IletisimFormu />);
 });
 
 test('[2] iletişim formu headerı render ediliyor', () => {
-  //get by text ile h1 tagini yakalayın
-  //to be in the document, to be truthy, to have text content ile kontrol edin.
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+
+  const h1 = screen.getByText('İletişim Formu');
+  expect(h1).toBeInTheDocument();
+  expect(h1).toBeTruthy();
+  expect(h1).toHaveTextContent('İletişim Formu');
+
 });
 
 test('[3] kullanıcı adını 5 karakterden az girdiğinde BİR hata mesajı render ediyor.', async () => {
-  //get by label text ile name alanını yakalayınız
-  //find all by test id ile error mesajlarını yakalayın
-  //to have length ile kontrol edin.
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const name = screen.getByLabelText('Ad*');
+  userEvent.type(name, '1234');
+  const error = await screen.findAllByTestId('error');
+  expect(error).toHaveLength(1);
+
 });
 
 test('[4] kullanıcı inputları doldurmadığında ÜÇ hata mesajı render ediliyor.', async () => {
-  //hiç bir alanı doldurmadan get by role ile butonu yakalayın
-  //error mesajlarının to have lengthine bakarak kontrol edin
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const button = screen.getByRole('button', { name: /Gönder/i });
+  userEvent.click(button);
+  const error = await screen.findAllByTestId('error');
+  expect(error).toHaveLength(3);
+
 });
 
 test('[5] kullanıcı doğru ad ve soyad girdiğinde ama email girmediğinde BİR hata mesajı render ediliyor.', async () => {
-  //get by test id ile input alanlarını yakalayın
-  //error mesajlarının to have lengthine bakarak kontrol edin
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+
+  const name = screen.getByTestId('name-input');
+  const lastname = screen.getByTestId('lastName-input');
+  userEvent.type(name, 'Mustafa');
+  userEvent.type(lastname, 'Doganguzel');
+
+  const button = screen.getByRole('button', { name: /Gönder/i });
+  userEvent.click(button);
+  const error = await screen.findAllByTestId('error');
+  expect(error).toHaveLength(1);
+
+
 });
 
 test('[6] geçersiz bir mail girildiğinde "Hata: email geçerli bir email adresi olmalıdır." hata mesajı render ediliyor', async () => {
-  //errorı get by test id ile yakalayın
-  //to have text content ile hata metnini kontrol edin
-  expect('kodlarınızı yazınca').toBe('bu assertionı silin');
+  const email = screen.getByTestId('email-input');
+  userEvent.type(email, 'mustafa');
+  const error = await screen.findByTestId('error');
+  expect(error).toHaveTextContent(
+    'Hata: email geçerli bir email adresi olmalıdır.'
+  );
+
 });
 
 test('[7] soyad girilmeden gönderilirse "Hata: soyad gereklidir." mesajı render ediliyor', async () => {
@@ -60,37 +80,7 @@ test('[9] form gönderildiğinde girilen tüm değerler render ediliyor.', async
 
 //
 
-// BURADAN SONRASINA DOKUNMAYIN //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 const testFile = fs
   .readFileSync(path.resolve(__dirname, './IletisimFormu.test.jsx'), 'utf8')
   .replaceAll(/(?:\\r\\n|\\r|\\n| )/g, '');
